@@ -1,23 +1,10 @@
 package com.example.appmovil.viewmodel
 
-// Archivo sugerido: viewmodel/CartViewModel.kt
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.appmovil.model.Producto // Necesitas crear esta Data Class
 
-// Clase de datos para un producto (basada en tu listaProductos de Productos.jsx)
-data class Producto(
-    val id: Int,
-    val nombre: String,
-    val precio: Int, // Usamos Int para simplificar
-    val descripcion: String,
-    val categoria: String,
-    val imagen: String // Opcional, para usar con Coil/Glide si se necesita
-)
-
-// Clase para el ítem del carrito (con cantidad)
 data class CartItem(
     val producto: Producto,
     val cantidad: Int

@@ -27,16 +27,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.appmovil.viewmodel.AuthViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.appmovil.navigation.AppScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(
-    navController: NavController,
-    authViewModel: AuthViewModel? = null
-) {
-    val sharedAuthViewModel = authViewModel ?: viewModel()
-    val currentUser by sharedAuthViewModel.currentUser.observeAsState()
-    val isAuthenticated by sharedAuthViewModel.isAuthenticated.observeAsState()
+fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
+
+    val currentUser by authViewModel.currentUser.observeAsState()
+    val isAuthenticated by authViewModel.isAuthenticated.observeAsState()
 
     LaunchedEffect(isAuthenticated) {
         if (isAuthenticated == false) {
@@ -53,7 +51,7 @@ fun ProfileScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            sharedAuthViewModel.logout()
+                            authViewModel.logout()
                         }
                     ) {
                         Icon(Icons.Default.ExitToApp, "Cerrar Sesión")
@@ -146,7 +144,7 @@ fun ProfileScreen(
 
                 OutlinedButton(
                     onClick = {
-                        sharedAuthViewModel.deleteUser()
+                        authViewModel.deleteUser()
                         navController.navigate(AppScreen.Welcome.route) {
                             popUpTo(AppScreen.Profile.route) { inclusive = true }
                         }
@@ -163,5 +161,5 @@ fun ProfileScreen(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    ProfileScreen(navController = rememberNavController())
+    ProfileScreen(navController = rememberNavController(), authViewModel = viewModel())
 }

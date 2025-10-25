@@ -1,11 +1,9 @@
 package com.example.appmovil.view
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -23,33 +21,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import com.example.appmovil.navigation.AppScreen
 import com.example.appmovil.viewmodel.AuthViewModel
-import kotlin.let
-import kotlin.text.isNotBlank
-import kotlin.text.isNotEmpty
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(
-    navController: NavController,
-    authViewModel: AuthViewModel? = null
-) {
-    val sharedAuthViewModel = authViewModel ?: viewModel()
+fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
+    // SOLUCIÓN 2: Eliminamos la línea 'sharedAuthViewModel' y usamos 'authViewModel' directamente.
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    val loginError by sharedAuthViewModel.loginError.observeAsState()
-    val registrationSuccess by sharedAuthViewModel.registrationSuccess.observeAsState(false)
+    // SOLUCIÓN 3: Observamos el estado directamente desde el 'authViewModel' proporcionado.
+    val loginError by authViewModel.loginError.observeAsState()
+    val registrationSuccess by authViewModel.registrationSuccess.observeAsState(false)
 
     LaunchedEffect(registrationSuccess) {
         if (registrationSuccess == true) {
-            navController.navigate(AppScreen.Profile.route) {
-                popUpTo(AppScreen.Register.route) { inclusive = true }
+            // Navega a la pantalla principal y limpia el historial para que el usuario no pueda "volver" a la pantalla de registro.
+            navController.navigate(AppScreen.Main.route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
+                }
             }
         }
     }
@@ -74,11 +70,12 @@ fun RegisterScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
+            // A partir de aquí, todas las llamadas usan 'authViewModel'
             OutlinedTextField(
                 value = name,
                 onValueChange = {
                     name = it
-                    sharedAuthViewModel.clearError()
+                    authViewModel.clearError()
                 },
                 label = { Text("Nombre") },
                 modifier = Modifier
@@ -91,7 +88,7 @@ fun RegisterScreen(
                 value = password,
                 onValueChange = {
                     password = it
-                    sharedAuthViewModel.clearError()
+                    authViewModel.clearError()
                 },
                 label = { Text("Contraseña") },
                 modifier = Modifier
@@ -114,8 +111,9 @@ fun RegisterScreen(
                 value = confirmPassword,
                 onValueChange = {
                     confirmPassword = it
-                    sharedAuthViewModel.clearError()
+                    authViewModel.clearError()
                 },
+                // ... resto del TextField ...
                 label = { Text("Confirmar Contraseña") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,7 +150,7 @@ fun RegisterScreen(
             Button(
                 onClick = {
                     if (password == confirmPassword) {
-                        sharedAuthViewModel.registerUser(name, password)
+                        authViewModel.registerUser(name, password)
                     }
                 },
                 modifier = Modifier
@@ -172,5 +170,5 @@ fun RegisterScreen(
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen(navController = rememberNavController())
+    RegisterScreen(navController = rememberNavController(), authViewModel = viewModel())
 }

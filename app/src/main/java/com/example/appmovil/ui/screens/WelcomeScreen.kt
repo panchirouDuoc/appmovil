@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.appmovil.R
-import com.example.appmovil.ui.theme.BaseAndroidProjectTheme
+import com.example.appmovil.ui.theme.AppMovilTheme
 
 @Composable
 fun WelcomeScreen(
@@ -69,7 +69,7 @@ fun WelcomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPreview() {
-    BaseAndroidProjectTheme {
+    AppMovilTheme {
         WelcomeScreen()
     }
 }
@@ -77,7 +77,7 @@ fun WelcomeScreenPreview() {
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun WelcomeScreenDarkPreview() {
-    BaseAndroidProjectTheme {
+    AppMovilTheme {
         WelcomeScreen()
     }
 }

@@ -28,25 +28,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.appmovil.viewmodel.AuthViewModel
 import kotlin.let
 import kotlin.text.isNotBlank
+import com.example.appmovil.navigation.AppScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
-    navController: NavController,
-    authViewModel: AuthViewModel? = null
-) {
-    val sharedAuthViewModel = authViewModel ?: viewModel()
+fun LoginScreen(navController: NavController, authViewModel: AuthViewModel){
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    val loginError by sharedAuthViewModel.loginError.observeAsState()
-    val isAuthenticated by sharedAuthViewModel.isAuthenticated.observeAsState(false)
+
+    val loginError by authViewModel.loginError.observeAsState()
+    val isAuthenticated by authViewModel.isAuthenticated.observeAsState(false)
 
     LaunchedEffect(isAuthenticated) {
-        if (isAuthenticated == false) {
-            navController.navigate(AppScreen.Welcome.route) {
-                popUpTo(AppScreen.Profile.route) { inclusive = true }
+        if (isAuthenticated == true) {
+            navController.navigate(AppScreen.Main.route) {
+                popUpTo(AppScreen.Login.route) { inclusive = true }
             }
         }
     }
@@ -75,7 +73,7 @@ fun LoginScreen(
                 value = name,
                 onValueChange = {
                     name = it
-                    sharedAuthViewModel.clearError()
+                    authViewModel.clearError()
                 },
                 label = { Text("Nombre") },
                 modifier = Modifier
@@ -88,7 +86,7 @@ fun LoginScreen(
                 value = password,
                 onValueChange = {
                     password = it
-                    sharedAuthViewModel.clearError()
+                    authViewModel.clearError()
                 },
                 label = { Text("Contraseña") },
                 modifier = Modifier
@@ -117,7 +115,7 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    sharedAuthViewModel.loginWithCredentials(name, password)
+                    authViewModel.loginWithCredentials(name, password)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -143,7 +141,7 @@ fun LoginScreen(
                 TextButton(
                     onClick = {
                         navController.navigate(AppScreen.Register.route)
-                        sharedAuthViewModel.clearError()
+                        authViewModel.clearError()
                     }
                 ) {
                     Text("Regístrate")
@@ -156,5 +154,5 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController())
+    LoginScreen(navController = rememberNavController(), authViewModel = viewModel())
 }

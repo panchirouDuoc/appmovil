@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appmovil.viewmodel.CartViewModel
-import com.example.appmovil.viewmodel.Producto
+import com.example.appmovil.model.Producto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel = viewModel()) {
+fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
     // Observa el estado (LiveData) de los productos
     val products by cartViewModel.productos.observeAsState(emptyList())
 

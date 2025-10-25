@@ -9,14 +9,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appmovil.viewmodel.CartViewModel
 import com.example.appmovil.viewmodel.CartItem
+import com.example.appmovil.model.Producto
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel = viewModel()) {
+fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel) {
     // Observa el estado del carrito
     val cartItems by cartViewModel.cartItems.observeAsState(emptyList())
 

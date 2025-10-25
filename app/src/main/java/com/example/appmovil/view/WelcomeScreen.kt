@@ -23,14 +23,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.appmovil.R
 import com.example.appmovil.viewmodel.AuthViewModel
+import com.example.appmovil.navigation.AppScreen
 
 @Composable
-fun WelcomeScreen(
-    navController: NavController,
-    authViewModel: AuthViewModel? = null
-) {
-    val sharedAuthViewModel = authViewModel ?: viewModel()
-    val hasUser = sharedAuthViewModel.hasExistingUser()
+fun WelcomeScreen(navController: NavController, authViewModel: AuthViewModel){
+
+    val hasUser = authViewModel.hasExistingUser()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,15 +36,6 @@ fun WelcomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Logo de la aplicación",
-            modifier = Modifier
-                .size(150.dp)
-                .padding(bottom = 32.dp),
-            contentScale = ContentScale.Fit
-        )
-
         Text(
             text = "¡Bienvenido!",
             fontSize = 32.sp,
@@ -55,8 +44,18 @@ fun WelcomeScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
+        Image(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Logo de la aplicación",
+            modifier = Modifier
+                .size(500.dp)
+                .padding(bottom = 32.dp),
+            contentScale = ContentScale.Fit
+        )
+
+
         Text(
-            text = "Tu aplicación de gestión personal",
+            text = "Desde el Huerto hasta tu Hogar",
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -66,9 +65,9 @@ fun WelcomeScreen(
         Button(
             onClick = {
                 if (hasUser) {
-                    navController.navigate(AppScreen.QuickLogin.route)
-                } else {
                     navController.navigate(AppScreen.Login.route)
+                } else {
+                    navController.navigate(AppScreen.Register.route)
                 }
             },
             modifier = Modifier
@@ -86,5 +85,5 @@ fun WelcomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPreview() {
-    WelcomeScreen(navController = rememberNavController())
+    WelcomeScreen(navController = rememberNavController(), authViewModel = viewModel())
 }
