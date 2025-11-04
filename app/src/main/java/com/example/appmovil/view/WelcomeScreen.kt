@@ -2,11 +2,6 @@ package com.example.appmovil.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,13 +17,33 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.appmovil.R
-import com.example.appmovil.viewmodel.AuthViewModel
 import com.example.appmovil.navigation.AppScreen
+import com.example.appmovil.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun WelcomeScreen(navController: NavController, authViewModel: AuthViewModel){
 
     val hasUser = authViewModel.hasExistingUser()
+
+    //navegacion
+    //ejecuta solo cuando el composable entra en la composicion
+
+    LaunchedEffect(key1 = true) {
+        delay(3000)
+        val route = if (hasUser) {
+            AppScreen.Login.route
+        } else {
+            AppScreen.Register.route
+        }
+
+        navController.navigate(route) {
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = true
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,23 +77,6 @@ fun WelcomeScreen(navController: NavController, authViewModel: AuthViewModel){
             modifier = Modifier.padding(bottom = 48.dp)
         )
 
-        Button(
-            onClick = {
-                if (hasUser) {
-                    navController.navigate(AppScreen.Login.route)
-                } else {
-                    navController.navigate(AppScreen.Register.route)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-        ) {
-            Text(
-                text = "Continuar",
-                fontSize = 18.sp
-            )
-        }
     }
 }
 

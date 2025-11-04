@@ -1,14 +1,12 @@
 package com.example.appmovil.view
 
+
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -28,13 +26,18 @@ import com.example.appmovil.viewmodel.AuthViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import com.example.appmovil.navigation.AppScreen
+import com.example.appmovil.ui.screens.ComponentSection
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
 
     val currentUser by authViewModel.currentUser.observeAsState()
     val isAuthenticated by authViewModel.isAuthenticated.observeAsState()
+    var selectedItem by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(isAuthenticated) {
         if (isAuthenticated == false) {
@@ -59,89 +62,103 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 }
             )
         }
-    ) { innerPadding ->
-        Column(
+    ) { paddingValues ->
+
+        LazyColumn(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(paddingValues),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Icon(
-                Icons.Default.Person,
-                contentDescription = "Avatar",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            item {
 
-            currentUser?.let { user ->
-                Text(
-                    text = "¡Bienvenido!",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = "Avatar",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape),
+                    tint = MaterialTheme.colorScheme.primary
                 )
+                currentUser?.let { user ->
+                ComponentSection(title = "Opciones") {
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    Text(
+                        text = "Información del Usuario",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Información del Usuario",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.primary
+                            text = "Nombre:",
+                            fontWeight = FontWeight.Medium
                         )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Nombre:",
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(text = user.name)
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Cuenta creada:",
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                    .format(Date(user.createdAt))
-                            )
-                        }
-
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.Green.copy(alpha = 0.1f)
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "✓ Sesión activa",
-                                modifier = Modifier.padding(12.dp),
-                                color = Color.Green,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                        Text(text = user.name)
                     }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Cuenta creada:",
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                .format(Date(user.createdAt))
+                        )
+                    }
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.Green.copy(alpha = 0.1f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "✓ Sesión activa",
+                            modifier = Modifier.padding(12.dp),
+                            color = Color.Green,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Divider()
+
+                    ListItem(
+                        headlineContent = { Text("Configuración") },
+                        supportingContent = { Text("Ajustes de la aplicación") },
+                        leadingContent = {
+                            Icon(Icons.Default.Settings, contentDescription = null)
+                        },
+                        trailingContent = {
+                            Icon(Icons.Default.ChevronRight, contentDescription = null)
+                        }
+                    )
+                    Divider()
+
+                    ListItem(
+                        headlineContent = { Text("Notificaciones") },
+                        supportingContent = { Text("Gestionar notificaciones") },
+                        leadingContent = {
+                            Icon(
+                                Icons.Default.Notifications,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = false,
+                                onCheckedChange = {}
+                            )
+                        }
+                    )
                 }
-
-                Spacer(modifier = Modifier.weight(1f))
-
                 OutlinedButton(
                     onClick = {
                         authViewModel.deleteUser()
@@ -153,7 +170,7 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
                 ) {
                     Text("Eliminar Cuenta")
                 }
-            }
+            }}
         }
     }
 }

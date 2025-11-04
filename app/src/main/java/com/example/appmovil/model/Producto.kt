@@ -1,13 +1,11 @@
 package com.example.appmovil.model
-
-// src/com/example/app/model/Producto.kt
 data class Producto(
     val id: Int,
     val nombre: String,
     val precio: Int,
     val descripcion: String,
     val categoria: String,
-    val imagen: String // Ruta de la imagen
+    val imagen: String
 )
 
 data class CartItem(

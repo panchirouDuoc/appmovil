@@ -8,7 +8,7 @@ import com.example.appmovil.data.UserRepository
 import com.example.appmovil.model.User
 import kotlin.text.isNotBlank
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+open class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = UserRepository(application)
 
     private val _isAuthenticated = MutableLiveData<Boolean>()
