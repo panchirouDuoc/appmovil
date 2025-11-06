@@ -1,6 +1,5 @@
 package com.example.appmovil.view
 
-// src/com/example/app/view/CarritoScreen.kt
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,18 +9,19 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.appmovil.viewmodel.CartViewModel
-import com.example.appmovil.viewmodel.CartItem
+import com.example.appmovil.model.CartItem
 import com.example.appmovil.model.Producto
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.appmovil.navigation.AppScreen
+
+import com.example.appmovil.viewModel.CartViewModel
+import com.example.appmovil.viewModel.OrderViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel) {
-    // Observa el estado del carrito
-    val cartItems by cartViewModel.cartItems.observeAsState(emptyList())
+fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel, orderViewModel: OrderViewModel) {
 
-    // Obtiene los cálculos (similar a useMemo)
+    val cartItems by cartViewModel.cartItems.observeAsState(emptyList())
     val total = cartViewModel.calculateTotal()
     val puntos = cartViewModel.calculatePoints()
 
@@ -37,25 +37,26 @@ fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel) {
             if (cartItems.isEmpty()) {
                 Text("Tu carrito está vacío", style = MaterialTheme.typography.headlineSmall)
             } else {
-                // Muestra la lista de productos (similar a Table body en Carrito.jsx)
+
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(cartItems) { item ->
                         CartItemRow(item = item)
                     }
                 }
 
-                // Resumen del carrito (similar a Table footer en Carrito.jsx)
                 CartSummary(total = total, puntos = puntos)
-
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botones de acción
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     OutlinedButton(onClick = { cartViewModel.clearCart() }) {
-                        Text("Vaciar carrito") // Similar a onClear
+                        Text("Vaciar carrito")
                     }
-                    Button(onClick = { /* Lógica de Pagar/Checkout */ }) {
-                        Text("Pagar") // Similar a onCheckout
+                    Button(onClick = {
+                        orderViewModel.createOrder(cartItems, total)
+                        cartViewModel.clearCart()
+                        navController.navigate(AppScreen.Orders.route)
+                    }) {
+                        Text("Pagar")
                     }
                 }
             }

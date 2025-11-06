@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -26,11 +27,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.appmovil.R
 import com.example.appmovil.navigation.AppScreen
-import com.example.appmovil.viewmodel.AuthViewModel
+import com.example.appmovil.viewModel.AuthViewModel
+import com.example.appmovil.viewModel.CartViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController, authViewModel: AuthViewModel) {
+fun MainScreen(navController: NavController, authViewModel: AuthViewModel,cartViewModel: CartViewModel) {
     var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -44,7 +47,7 @@ fun MainScreen(navController: NavController, authViewModel: AuthViewModel) {
         },
 
         bottomBar = {
-            AppBottomNavigationBar(navController = navController)
+            AppBottomNavigationBar(navController = navController,cartViewModel = cartViewModel)
         }
     ) { innerPadding ->
         LazyColumn(
@@ -70,7 +73,12 @@ fun MainScreen(navController: NavController, authViewModel: AuthViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBottomNavigationBar(navController: NavController) {
+fun AppBottomNavigationBar(navController: NavController,cartViewModel: CartViewModel) {
+
+    val cartItems by cartViewModel.cartItems.observeAsState(initial = emptyList())
+    val itemCount = cartItems.sumOf { it.cantidad }
+
+
     NavigationBar {
         NavigationBarItem(
             selected = false,
@@ -90,7 +98,10 @@ fun AppBottomNavigationBar(navController: NavController) {
             selected = false,
             onClick = { navController.navigate(AppScreen.Cart.route) },
             icon = {
-                BadgedBox(badge = { Badge { Text("") } }) {
+
+                BadgedBox(
+                    badge = { if (itemCount > 0) { Badge { Text(text = itemCount.toString())}}}
+                ) {
                     Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito")
                 }
             },
@@ -99,7 +110,7 @@ fun AppBottomNavigationBar(navController: NavController) {
 
         NavigationBarItem(
             selected = false,
-            onClick = { /* navController.navigate(AppScreen.Orders.route) */ },
+            onClick = { navController.navigate(AppScreen.Orders.route) },
             icon = { Icon(Icons.Default.Textsms, contentDescription = "Pedidos") },
             label = { Text("Pedidos") }
         )
@@ -110,6 +121,7 @@ fun AppBottomNavigationBar(navController: NavController) {
             icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
             label = { Text("Perfil") }
         )
+
     }
 }
 
@@ -144,14 +156,3 @@ fun MainScreenContent(
         )
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-
-    MainScreen(
-        navController = rememberNavController(),
-        authViewModel = viewModel()
-    )
-}
-

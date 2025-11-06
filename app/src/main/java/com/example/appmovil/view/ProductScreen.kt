@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.appmovil.viewmodel.CartViewModel
+import com.example.appmovil.viewModel.CartViewModel
 import com.example.appmovil.model.Producto
 import com.example.appmovil.navigation.AppScreen
 import androidx.compose.foundation.Image
@@ -35,7 +35,7 @@ fun ProductsScreen(navController: NavController, cartViewModel: CartViewModel) {
             TopAppBar(title = { Text("Productos Huerto Hogar") })
         },
         bottomBar = {
-            AppBottomNavigationBar(navController = navController)
+            AppBottomNavigationBar(navController = navController, cartViewModel = cartViewModel)
         }
     ) { innerPadding ->
 

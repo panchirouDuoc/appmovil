@@ -7,4 +7,7 @@ sealed class AppScreen(val route: String) {
     object Products : AppScreen("products_screen")
     object Cart : AppScreen("cart_screen")
     object Profile : AppScreen("profile_screen")
+
+    object Orders : AppScreen("order_screen")
+
 }

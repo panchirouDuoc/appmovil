@@ -22,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
-import com.example.appmovil.viewmodel.AuthViewModel
+import com.example.appmovil.viewModel.AuthViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import com.example.appmovil.navigation.AppScreen

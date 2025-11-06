@@ -23,25 +23,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.appmovil.navigation.AppScreen
-import com.example.appmovil.viewmodel.AuthViewModel
+import com.example.appmovil.viewModel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
-    // SOLUCIÓN 2: Eliminamos la línea 'sharedAuthViewModel' y usamos 'authViewModel' directamente.
+
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    // SOLUCIÓN 3: Observamos el estado directamente desde el 'authViewModel' proporcionado.
+
     val loginError by authViewModel.loginError.observeAsState()
     val registrationSuccess by authViewModel.registrationSuccess.observeAsState(false)
 
     LaunchedEffect(registrationSuccess) {
         if (registrationSuccess == true) {
-            // Navega a la pantalla principal y limpia el historial para que el usuario no pueda "volver" a la pantalla de registro.
+
             navController.navigate(AppScreen.Main.route) {
                 popUpTo(navController.graph.startDestinationId) {
                     inclusive = true
@@ -70,7 +70,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // A partir de aquí, todas las llamadas usan 'authViewModel'
+
             OutlinedTextField(
                 value = name,
                 onValueChange = {
@@ -113,7 +113,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                     confirmPassword = it
                     authViewModel.clearError()
                 },
-                // ... resto del TextField ...
+
                 label = { Text("Confirmar Contraseña") },
                 modifier = Modifier
                     .fillMaxWidth()

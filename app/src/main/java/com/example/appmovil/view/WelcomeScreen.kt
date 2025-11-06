@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.appmovil.R
 import com.example.appmovil.navigation.AppScreen
-import com.example.appmovil.viewmodel.AuthViewModel
+import com.example.appmovil.viewModel.AuthViewModel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -26,8 +26,6 @@ fun WelcomeScreen(navController: NavController, authViewModel: AuthViewModel){
 
     val hasUser = authViewModel.hasExistingUser()
 
-    //navegacion
-    //ejecuta solo cuando el composable entra en la composicion
 
     LaunchedEffect(key1 = true) {
         delay(3000)

@@ -8,11 +8,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.appmovil.navigation.AppScreen // <-- MUY IMPORTANTE
-import com.example.appmovil.ui.theme.AppMovilTheme // O el nombre de tu tema
+import com.example.appmovil.navigation.AppScreen
+import com.example.appmovil.ui.theme.AppMovilTheme
 import com.example.appmovil.view.*
-import com.example.appmovil.viewmodel.AuthViewModel
-import com.example.appmovil.viewmodel.CartViewModel
+import com.example.appmovil.viewModel.AuthViewModel
+import com.example.appmovil.viewModel.CartViewModel
+import com.example.appmovil.viewModel.OrderViewModel
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,12 +30,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-
-    // CREACIÓN ÚNICA DE VIEWMODELS: Este es el único lugar donde se crean.
     val authViewModel: AuthViewModel = viewModel()
     val cartViewModel: CartViewModel = viewModel()
+    val orderViewModel: OrderViewModel = viewModel()
 
-    // NAVEGACIÓN ÚNICA: Este es el único NavHost de toda la app.
+
+
     NavHost(navController = navController, startDestination = AppScreen.Welcome.route) {
 
         composable(AppScreen.Welcome.route) {
@@ -60,7 +62,8 @@ fun AppNavigation() {
         composable(AppScreen.Main.route) {
             MainScreen(
                 navController = navController,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                cartViewModel = cartViewModel
             )
         }
         composable(AppScreen.Products.route) {
@@ -72,7 +75,8 @@ fun AppNavigation() {
         composable(AppScreen.Cart.route) {
             CarritoScreen(
                 navController = navController,
-                cartViewModel = cartViewModel
+                cartViewModel = cartViewModel,
+                orderViewModel = orderViewModel
             )
         }
         composable(AppScreen.Profile.route) {
@@ -80,11 +84,15 @@ fun AppNavigation() {
                 navController = navController,
                 authViewModel = authViewModel
             )
-        }
 
-        // Aquí puedes añadir el resto de tus rutas
-        // composable(AppScreen.Products.route) { ... }
-        // composable(AppScreen.Cart.route) { ... }
+        }
+        composable(AppScreen.Orders.route) {
+            OrdersScreen(
+                navController = navController,
+                orderViewModel = orderViewModel,
+                cartViewModel = cartViewModel
+            )
+        }
     }
 }
     

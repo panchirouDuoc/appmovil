@@ -1,14 +1,10 @@
-package com.example.appmovil.viewmodel
+package com.example.appmovil.viewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.appmovil.model.Producto
-
-data class CartItem(
-    val producto: Producto,
-    val cantidad: Int
-)
+import com.example.appmovil.model.CartItem
 
 class CartViewModel : ViewModel() {
     private val _productos = MutableLiveData(initialProductList())
@@ -47,5 +43,5 @@ class CartViewModel : ViewModel() {
 private fun initialProductList() = listOf(
     Producto(1, "Manzana Fuji Bolsa, 1 kg", 1890, "Manzanas Fuji crujientes y dulces...", "frutas", "/images/manzana.avif"),
     Producto(2, "Naranja Valencia Pote, 300 g", 2490, "Jugosas y ricas en vitamina C...", "frutas", "/images/naranja.avif"),
-    // ... Agrega los demás productos aquí
+
 )
