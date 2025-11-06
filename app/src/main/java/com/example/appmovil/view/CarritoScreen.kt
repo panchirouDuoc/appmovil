@@ -1,5 +1,10 @@
 package com.example.appmovil.view
 
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +24,8 @@ import com.example.appmovil.viewModel.OrderViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
+
 fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel, orderViewModel: OrderViewModel) {
 
     val cartItems by cartViewModel.cartItems.observeAsState(emptyList())
@@ -52,6 +59,7 @@ fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel, or
                         Text("Vaciar carrito")
                     }
                     Button(onClick = {
+                        vibratePattern(navController.context)
                         orderViewModel.createOrder(cartItems, total)
                         cartViewModel.clearCart()
                         navController.navigate(AppScreen.Orders.route)
@@ -61,6 +69,25 @@ fun CarritoScreen(navController: NavController, cartViewModel: CartViewModel, or
                 }
             }
         }
+    }
+}
+private fun vibratePattern(context: Context) {
+    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        vibratorManager.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+
+    // Patrón SOS: ... --- ...
+    val pattern = longArrayOf(0, 200, 100, 200, 100, 200, 100, 500, 100, 500, 100, 500, 100, 200, 100, 200, 100, 200)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
+    } else {
+        @Suppress("DEPRECATION")
+        vibrator.vibrate(pattern, -1)
     }
 }
 

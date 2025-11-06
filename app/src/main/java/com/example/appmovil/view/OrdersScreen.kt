@@ -1,5 +1,7 @@
 package com.example.appmovil.view
 
+import android.Manifest
+import android.content.Context
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,16 +15,61 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavController
 import com.example.appmovil.model.Order
 import com.example.appmovil.viewModel.OrderViewModel
 import com.example.appmovil.viewModel.OrderStatus
 import com.example.appmovil.viewModel.CartViewModel
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import com.example.appmovil.R
+import androidx.compose.runtime.*
 
+
+private const val CHANNEL_ID = "order_status_channel"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrdersScreen(navController: NavController, orderViewModel: OrderViewModel, cartViewModel: CartViewModel) {
     val order by orderViewModel.currentOrder.observeAsState()
+    val context = LocalContext.current
+    var hasNotificationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else { mutableStateOf(true)}
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasNotificationPermission = isGranted
+        }
+    )
+    LaunchedEffect(key1 = true) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!hasNotificationPermission) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -32,21 +79,60 @@ fun OrdersScreen(navController: NavController, orderViewModel: OrderViewModel, c
             AppBottomNavigationBar(navController = navController, cartViewModel = cartViewModel)
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                if (order == null) {
-                    NoOrderView()
-                } else {
-                    OrderDetailsView(order = order!!, viewModel = orderViewModel)
+        Column(modifier = Modifier.padding(innerPadding)) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Se requiere permiso de notificación para avisarte sobre tu pedido.")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = { permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) }) {
+                            Text("Otorgar Permiso")
+                        }
+                    }
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+                    if (order == null) {
+                        NoOrderView()
+                    } else {
+                        OrderDetailsView(order = order!!, viewModel = orderViewModel, hasNotificationPermission = hasNotificationPermission)
+                    }
                 }
             }
         }
+    }
+}
+
+private fun sendSimpleNotification(context: Context) {
+
+    val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setContentTitle("Pedido Actualizado")
+        .setContentText("El estado de tu pedido ha cambiado.")
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .build()
+
+
+    try {
+        NotificationManagerCompat.from(context).notify(1, notification)
+    } catch (e: SecurityException) {
+        e.printStackTrace()
     }
 }
 
@@ -65,15 +151,10 @@ fun NoOrderView() {
 }
 
 @Composable
-fun OrderDetailsView(order: Order, viewModel: OrderViewModel) {
+fun OrderDetailsView(order: Order, viewModel: OrderViewModel,hasNotificationPermission: Boolean) {
     Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        // --- Card de la Boleta ---
         BoletaCard(order = order, viewModel = viewModel)
-
-        // --- Card del Estado del Pedido ---
         EstadoPedidoCard(orderStatus = order.status)
-
-        // --- Botones de acción ---
         OrderActionButtons(
             status = order.status,
             onAdvance = { viewModel.advanceOrderStatus() },
@@ -112,7 +193,6 @@ fun BoletaCard(order: Order, viewModel: OrderViewModel) {
 
 @Composable
 fun EstadoPedidoCard(orderStatus: OrderStatus) {
-    // Mapeo de estado a progreso, como en tu JSX
     val progressMap = mapOf(
         OrderStatus.NONE to 0.0f,
         OrderStatus.CONFIRMADO to 0.25f,
@@ -132,12 +212,14 @@ fun EstadoPedidoCard(orderStatus: OrderStatus) {
                     .fillMaxWidth()
                     .height(24.dp)
             )
+            if (orderStatus != OrderStatus.ENTREGADO) {
+
+            }
             Spacer(Modifier.height(8.dp))
             Text(orderStatus.displayText, modifier = Modifier.align(Alignment.End))
         }
     }
 }
-
 @Composable
 fun OrderActionButtons(status: OrderStatus, onAdvance: () -> Unit, onFinish: () -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
